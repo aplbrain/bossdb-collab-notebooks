@@ -19,7 +19,10 @@ with open('projects.json') as f:
 
 locations = []
 for key, attr in projects.items():
-    locations.append( (key, attr['locations'][0]))
+    try:
+        locations.append( (key, attr['locations'][0]))
+    except KeyError as e:
+        continue 
 
 # Function to replace the undefined variable with a specific value
 def replace_variable(cell, values):
