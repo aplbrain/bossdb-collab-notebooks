@@ -21,7 +21,8 @@ locations = []
 for key, attr in projects.items():
     try:
         locations.append( (key, attr['locations'][0]))
-    except KeyError as e:
+    except Exception as e:
+        print(key)
         continue 
 
 # Function to replace the undefined variable with a specific value
