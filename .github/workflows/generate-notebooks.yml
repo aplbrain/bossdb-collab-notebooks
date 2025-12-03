@@ -1,0 +1,50 @@
+name: Nightly Generate Colab Notebooks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 5 * * *" 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout collab notebooks repo
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: ./.github/actions/install_uv
+
+      - name: Install Python dependencies
+        run: uv sync
+
+      - name: Install CLI entrypoints (create-notebooks)
+        run: uv tool install .
+
+      - name: Generate notebooks from S3 metadata
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: bossdb-metadata-snapshot
+          S3_OBJECT_KEY: mongo-data.json
+        run: |
+          create-notebooks
+
+      - name: Configure authenticated remote
+        run: |
+          git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/aplbrain/bossdb-collab-notebooks.git
+
+      - name: Commit and push updated notebooks
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add notebooks/
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Automated nightly notebook generation"
+            git push origin HEAD:main
+          fi

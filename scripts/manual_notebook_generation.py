@@ -2,6 +2,7 @@ import nbformat as nbf
 import re
 import json
 from tqdm import tqdm
+
 VARIABLE_MAP = {
     "{{BOSSDB_URI}}": "uri", 
     "{{X_RANGE}}" : "xs", 
