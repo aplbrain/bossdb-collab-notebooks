@@ -1,0 +1,21 @@
+[project]
+name = "bossdb-collab-notebooks"
+version = "0.1.0"
+description = "Generates Colab notebooks for all BOSSDB public projects using nightly metadata snapshots."
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "nbformat",
+    "notebook",
+    "intern",
+    "cloud-volume",
+    "boto3",
+    "tqdm",
+]
+
+[project.scripts]
+create-notebooks = "scripts.auto_notebook_generation:main"
+
+[tool.setuptools]
+packages = ["scripts"]
