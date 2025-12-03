@@ -3,7 +3,7 @@ name: Nightly Generate Colab Notebooks
 on:
   workflow_dispatch:
   schedule:
-    - cron: "20 5 * * *" 
+    - cron: "20 5 * * *"
 
 jobs:
   build:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout collab notebooks repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install uv
         uses: ./.github/actions/install_uv
@@ -31,10 +33,6 @@ jobs:
         run: |
           create-notebooks
 
-      - name: Configure authenticated remote
-        run: |
-          git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/aplbrain/bossdb-collab-notebooks.git
-
       - name: Commit and push updated notebooks
         run: |
           git config user.name "github-actions"
@@ -46,5 +44,8 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "Automated nightly notebook generation"
+
+            git pull --rebase origin main
+
             git push origin HEAD:main
           fi
